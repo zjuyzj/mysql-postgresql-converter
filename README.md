@@ -11,7 +11,8 @@ for column typing purposes.
 GitLab-specific changes
 -----------------------
 
-This fork contains the following changes made for GitLab.
+The `gitlab` branch of this fork contains the following changes made for
+GitLab.
 
 - Guard against replacing '0000-00-00 00:00:00' inside SQL text fields.
 - Replace all MySQL zero-byte string literals `\0`. This is safe as of GitLab
