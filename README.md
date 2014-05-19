@@ -16,6 +16,8 @@ This fork contains the following changes made for GitLab.
 - Guard against replacing '0000-00-00 00:00:00' inside SQL text fields.
 - Replace all MySQL zero-byte string literals `\0`. This is safe as of GitLab
   6.8 because the GitLab database schema contains no binary columns.
+- Add the `index_create_statements.rb` script to concurrently recreate indices
+  dropped by `dbconverter.py`.
 
 How to use
 ----------
@@ -23,7 +25,7 @@ How to use
 First, dump your MySQL database in PostgreSQL-compatible format
 
     mysqldump --compatible=postgresql --default-character-set=utf8 \
-    -r databasename.mysql -u root databasename
+    -r databasename.mysql -u root gitlabhq_production
 
 Then, convert it using the dbconverter.py script
 
@@ -31,9 +33,15 @@ Then, convert it using the dbconverter.py script
 
 It'll print progress to the terminal.
 
-Finally, load your new dump into a fresh PostgreSQL database using: 
+Next, load your new dump into a fresh PostgreSQL database using: 
 
-`psql -f databasename.psql`
+`psql -f databasename.psql -d gitlabhq_production`
+
+Finally, recreate the indexes for your GitLab version.
+
+```
+ruby index_create_statements.rb /home/git/gitlab/db/schema.rb | psql -d gitlabhq_production
+```
 
 More information
 ----------------
