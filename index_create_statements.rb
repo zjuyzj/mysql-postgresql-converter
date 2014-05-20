@@ -32,4 +32,4 @@ def add_index(table_name, index_columns, options)
   puts "CREATE INDEX CONCURRENTLY #{index_name} ON #{table_name} USING #{index_using} (#{index_columns.join(', ')});"
 end
 
-load ARGF.read
+eval ARGF.read
