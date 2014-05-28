@@ -17,8 +17,8 @@ GitLab.
 - Guard against replacing '0000-00-00 00:00:00' inside SQL text fields.
 - Replace all MySQL zero-byte string literals `\0`. This is safe as of GitLab
   6.8 because the GitLab database schema contains no binary columns.
-- Add the `index_create_statements.rb` script to concurrently recreate indices
-  dropped by `dbconverter.py`.
+- Add the `add_index_statements.rb` script to recreate indices dropped by
+  `dbconverter.py`.
 
 How to use
 ----------
@@ -38,11 +38,8 @@ Next, load your new dump into a fresh PostgreSQL database using:
 
 `psql -f databasename.psql -d gitlabhq_production`
 
-Finally, recreate the indexes for your GitLab version.
-
-```
-ruby index_create_statements.rb /home/git/gitlab/db/schema.rb | psql -d gitlabhq_production
-```
+Finally, recreate the indexes for your GitLab version; see
+http://doc.gitlab.com/ce/update/mysql_to_postgresql.html#rebuild-indexes .
 
 More information
 ----------------
