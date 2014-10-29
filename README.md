@@ -19,6 +19,7 @@ GitLab.
   6.8 because the GitLab database schema contains no binary columns.
 - Add the `add_index_statements.rb` script to recreate indices dropped by
   `dbconverter.py`.
+- Never set 'NOT NULL' constraints on datetimes.
 
 How to use
 ----------
