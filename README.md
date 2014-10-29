@@ -20,6 +20,7 @@ GitLab.
 - Add the `add_index_statements.rb` script to recreate indices dropped by
   `dbconverter.py`.
 - Never set 'NOT NULL' constraints on datetimes.
+- Drop sequences before creating them.
 
 How to use
 ----------
