@@ -18,7 +18,7 @@ GitLab.
 - Replace all MySQL zero-byte string literals `\0`. This is safe as of GitLab
   6.8 because the GitLab database schema contains no binary columns.
 - Add the `add_index_statements.rb` script to recreate indices dropped by
-  `dbconverter.py`.
+  `db_converter.py`.
 - Never set 'NOT NULL' constraints on datetimes.
 - Drop sequences before creating them.
 
@@ -28,20 +28,19 @@ How to use
 First, dump your MySQL database in PostgreSQL-compatible format
 
     mysqldump --compatible=postgresql --default-character-set=utf8 \
-    -r databasename.mysql -u root gitlabhq_production
+    -r databasename.mysql -u root gitlabhq_production -p
 
 Then, convert it using the dbconverter.py script
 
-`python dbconverter.py databasename.mysql databasename.psql`
+`python db_converter.py databasename.mysql databasename.psql`
 
-It'll print progress to the terminal.
+It'll print progress to the terminal
 
 Next, load your new dump into a fresh PostgreSQL database using: 
 
 `psql -f databasename.psql -d gitlabhq_production`
 
-Finally, recreate the indexes for your GitLab version; see
-http://doc.gitlab.com/ce/update/mysql_to_postgresql.html#rebuild-indexes .
+Finally, [recreate the indexes for your GitLab version](http://doc.gitlab.com/ce/update/mysql_to_postgresql.html#rebuild-indexe).
 
 More information
 ----------------
