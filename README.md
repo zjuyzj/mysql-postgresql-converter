@@ -40,7 +40,7 @@ Next, load your new dump into a fresh PostgreSQL database using:
 
 `psql -f databasename.psql -d gitlabhq_production`
 
-Finally, [recreate the indexes for your GitLab version](http://doc.gitlab.com/ce/update/mysql_to_postgresql.html#rebuild-indexe).
+Finally, [recreate the indexes for your GitLab version](http://doc.gitlab.com/ce/update/mysql_to_postgresql.html#rebuild-indexes).
 
 More information
 ----------------
