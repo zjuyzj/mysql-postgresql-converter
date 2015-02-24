@@ -5,7 +5,7 @@
 #
 # ruby index_create_statements.rb /home/git/gitlab/db/schema.rb
 #
-# This script was created to work around the fact that dbconverter.py strips
+# This script was created to work around the fact that db_converter.py strips
 # all plain `KEY` statements from MySQL's `CREATE TABLE` statements.
 
 # Hack to get to the block that contains the actual schema definition
