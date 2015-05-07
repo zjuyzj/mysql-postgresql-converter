@@ -21,6 +21,7 @@ GitLab.
   `db_converter.py`.
 - Never set 'NOT NULL' constraints on datetimes.
 - Drop sequences before creating them.
+- Preserve default values of boolean (originally `tinyint(1)`) columns.
 
 How to use
 ----------
