@@ -28,7 +28,7 @@ def parse(input_filename, output_filename):
     creation_lines = []
     enum_types = []
     foreign_key_lines = []
-    fulltext_key_lines = []
+    index_lines = []
     sequence_lines = []
     cast_lines = []
     num_inserts = 0
@@ -171,15 +171,23 @@ def parse(input_filename, output_filename):
             elif line.startswith("CONSTRAINT"):
                 foreign_key_lines.append("ALTER TABLE \"%s\" ADD CONSTRAINT %s DEFERRABLE INITIALLY DEFERRED" % (current_table, line.split("CONSTRAINT")[1].strip().rstrip(",")))
                 foreign_key_lines.append("CREATE INDEX ON \"%s\" %s" % (current_table, line.split("FOREIGN KEY")[1].split("REFERENCES")[0].strip().rstrip(",")))
+            elif line.startswith("UNIQUE KEY \""):
+                index_name      = line.split('"')[1].split('"')[0]
+                index_columns   = line.split("(")[1].split(")")[0]
+                index_lines.append("CREATE UNIQUE INDEX \"%s\" ON %s (%s)" % (index_name, current_table, index_columns))
             elif line.startswith("UNIQUE KEY"):
-                creation_lines.append("UNIQUE (%s)" % line.split("(")[1].split(")")[0])
-            elif line.startswith("FULLTEXT KEY"):
-
-                fulltext_keys = " || ' ' || ".join( line.split('(')[-1].split(')')[0].replace('"', '').split(',') )
-                fulltext_key_lines.append("CREATE INDEX ON %s USING gin(to_tsvector('english', %s))" % (current_table, fulltext_keys))
-
+                index_columns   = line.split("(")[1].split(")")[0]
+                index_lines.append("CREATE UNIQUE INDEX ON %s (%s)" % (current_table, index_columns))
+            elif line.startswith("KEY \""):
+                index_name      = line.split('"')[1].split('"')[0]
+                index_columns   = line.split("(")[1].split(")")[0]
+                index_lines.append("CREATE INDEX \"%s\" ON %s (%s)" % (index_name, current_table, index_columns))
             elif line.startswith("KEY"):
-                pass
+                index_columns = line.split("(")[1].split(")")[0]
+                index_lines.append("CREATE INDEX ON %s (%s)" % (current_table, index_columns))
+            elif line.startswith("FULLTEXT KEY"):
+                fulltext_keys = " || ' ' || ".join( line.split('(')[-1].split(')')[0].replace('"', '').split(',') )
+                index_lines.append("CREATE INDEX ON %s USING gin(to_tsvector('english', %s))" % (current_table, fulltext_keys))
             # Is it the end of the table?
             elif line == ");":
                 output.write("CREATE TABLE \"%s\" (\n" % current_table)
@@ -212,9 +220,9 @@ def parse(input_filename, output_filename):
     for line in sequence_lines:
         output.write("%s;\n" % line)
 
-    # Write full-text indexkeyses out
-    output.write("\n-- Full Text keys --\n")
-    for line in fulltext_key_lines:
+    # Write indexes out
+    output.write("\n-- Indexes --\n")
+    for line in index_lines:
         output.write("%s;\n" % line)
 
     # Finish file
