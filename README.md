@@ -21,6 +21,7 @@ GitLab.
 - Drop sequences before creating them.
 - Import all indexes.
 - Import index names.
+- Preserve default values of boolean (originally `tinyint(1)`) columns.
 
 How to use
 ----------
