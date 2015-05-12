@@ -17,10 +17,10 @@ GitLab.
 - Guard against replacing '0000-00-00 00:00:00' inside SQL text fields.
 - Replace all MySQL zero-byte string literals `\0`. This is safe as of GitLab
   6.8 because the GitLab database schema contains no binary columns.
-- Add the `add_index_statements.rb` script to recreate indices dropped by
-  `db_converter.py`.
 - Never set 'NOT NULL' constraints on datetimes.
 - Drop sequences before creating them.
+- Import all indexes.
+- Import index names.
 - Preserve default values of boolean (originally `tinyint(1)`) columns.
 
 How to use
@@ -40,8 +40,6 @@ It'll print progress to the terminal
 Next, load your new dump into a fresh PostgreSQL database using: 
 
 `psql -f databasename.psql -d gitlabhq_production`
-
-Finally, [recreate the indexes for your GitLab version](http://doc.gitlab.com/ce/update/mysql_to_postgresql.html#rebuild-indexes).
 
 More information
 ----------------
