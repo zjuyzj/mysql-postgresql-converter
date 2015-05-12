@@ -22,6 +22,8 @@ GitLab.
 - Import all indexes.
 - Import index names.
 - Preserve default values of boolean (originally `tinyint(1)`) columns.
+- Import all indexes.
+- Import index names.
 
 How to use
 ----------
