@@ -200,6 +200,7 @@ def parse(input_filename, output_filename):
                 index_lines.append("CREATE INDEX ON %s USING gin(to_tsvector('english', %s))" % (current_table, fulltext_keys))
             # Is it the end of the table?
             elif line == ");":
+                output.write("DROP TABLE IF EXISTS \"%s\";\n" % current_table)
                 output.write("CREATE TABLE \"%s\" (\n" % current_table)
                 for i, line in enumerate(creation_lines):
                     output.write("    %s%s\n" % (line, "," if i != (len(creation_lines) - 1) else ""))
