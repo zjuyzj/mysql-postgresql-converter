@@ -29,6 +29,7 @@ def parse(input_filename, output_filename):
     enum_types = []
     foreign_key_lines = []
     index_lines = []
+    drop_index_lines = []
     sequence_lines = []
     cast_lines = []
     num_inserts = 0
@@ -185,6 +186,7 @@ def parse(input_filename, output_filename):
                 index_name      = line.split('"')[1].split('"')[0]
                 index_columns   = line.split("(")[1].split(")")[0]
                 index_lines.append("CREATE UNIQUE INDEX \"%s\" ON %s (%s)" % (index_name, current_table, index_columns))
+                drop_index_lines.append("DROP INDEX IF EXISTS \"%s\"" % index_name)
             elif line.startswith("UNIQUE KEY"):
                 index_columns   = line.split("(")[1].split(")")[0]
                 index_lines.append("CREATE UNIQUE INDEX ON %s (%s)" % (current_table, index_columns))
@@ -192,6 +194,7 @@ def parse(input_filename, output_filename):
                 index_name      = line.split('"')[1].split('"')[0]
                 index_columns   = line.split("(")[1].split(")")[0]
                 index_lines.append("CREATE INDEX \"%s\" ON %s (%s)" % (index_name, current_table, index_columns))
+                drop_index_lines.append("DROP INDEX IF EXISTS \"%s\"" % index_name)
             elif line.startswith("KEY"):
                 index_columns = line.split("(")[1].split(")")[0]
                 index_lines.append("CREATE INDEX ON %s (%s)" % (current_table, index_columns))
@@ -200,6 +203,7 @@ def parse(input_filename, output_filename):
                 index_lines.append("CREATE INDEX ON %s USING gin(to_tsvector('english', %s))" % (current_table, fulltext_keys))
             # Is it the end of the table?
             elif line == ");":
+                output.write("DROP TABLE IF EXISTS \"%s\";\n" % current_table)
                 output.write("CREATE TABLE \"%s\" (\n" % current_table)
                 for i, line in enumerate(creation_lines):
                     output.write("    %s%s\n" % (line, "," if i != (len(creation_lines) - 1) else ""))
@@ -229,6 +233,13 @@ def parse(input_filename, output_filename):
     output.write("\n-- Sequences --\n")
     for line in sequence_lines:
         output.write("%s;\n" % line)
+
+    # This line is an anchor for move_drop_indexes.ed
+    output.write("\n-- Drop indexes --\n")
+    for line in drop_index_lines:
+        output.write("%s;\n" % line)
+    # This line is an anchor for move_drop_indexes.ed
+    output.write("-- END Drop indexes --\n")
 
     # Write indexes out
     output.write("\n-- Indexes --\n")

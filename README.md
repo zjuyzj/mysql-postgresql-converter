@@ -19,11 +19,11 @@ GitLab.
   6.8 because the GitLab database schema contains no binary columns.
 - Never set 'NOT NULL' constraints on datetimes.
 - Drop sequences before creating them.
-- Import all indexes.
-- Import index names.
 - Preserve default values of boolean (originally `tinyint(1)`) columns.
 - Import all indexes.
 - Import index names.
+- Drop tables before creating.
+- Drop indexes before creating.
 
 How to use
 ----------
@@ -33,11 +33,19 @@ First, dump your MySQL database in PostgreSQL-compatible format
     mysqldump --compatible=postgresql --default-character-set=utf8 \
     -r databasename.mysql -u root gitlabhq_production -p
 
-Then, convert it using the dbconverter.py script
+Then, convert it using the dbconverter.py script.
 
-`python db_converter.py databasename.mysql databasename.psql`
+    python db_converter.py databasename.mysql databasename.psql
 
 It'll print progress to the terminal
+
+Now we have a DB dump that can be imported but the dump will be slow due
+to existing indexes. We use 'ed' to edit the DB dump file and move the
+'DROP INDEX' statements to the start of the import. Ed is not the fastest
+tool for this job if your DB dump is multiple gigabytes. (Patches to
+the converter are welcome!)
+
+    ed -s databasename.psql < move_drop_indexes.ed
 
 Next, load your new dump into a fresh PostgreSQL database using: 
 
