@@ -30,7 +30,7 @@ How to use
 
 First, dump your MySQL database in PostgreSQL-compatible format
 
-    mysqldump --compatible=postgresql --default-character-set=utf8 \
+    mysqldump --compatible=postgresql --default-character-set=utf8 --hex-blob \
     -r databasename.mysql -u root gitlabhq_production -p
 
 Then, convert it using the dbconverter.py script.

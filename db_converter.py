@@ -5,7 +5,7 @@ Fixes a MySQL dump made with the right format so it can be directly
 imported to a new PostgreSQL database.
 
 Dump using:
-mysqldump --compatible=postgresql --default-character-set=utf8 -r databasename.mysql -u root databasename
+mysqldump --compatible=postgresql --default-character-set=utf8 --hex-blob -r databasename.mysql -u root databasename
 """
 
 import re
@@ -84,6 +84,11 @@ def parse(input_filename, output_filename):
                 creation_lines = []
             # Inserting data into a table?
             elif line.startswith("INSERT INTO"):
+                # blob/varbinary type needed to be converted exists only in these tables
+                table_names = ['gpg_keys', 'gpg_signatures', 'push_event_payloads', 'merge_request_diff_commits']
+                # A temporary solution, safe when NO these patterns in the midway of any varchar or text data in these tables
+                if line.split(' ')[2][1:-1] in table_names:
+                    line = re.sub(r'(0x)([0-9A-F]{40}|[0-9A-F]{16})', r"decode('\2','hex')",line)
                 output.write(re.sub(r"([^'])'0000-00-00 00:00:00'", r"\1NULL", line.encode("utf8")) + "\n")
                 num_inserts += 1
             # ???
@@ -143,9 +148,14 @@ def parse(input_filename, output_filename):
                 elif type == "datetime":
                     type = "timestamp with time zone"
                     extra = extra.replace("NOT NULL", "")
+                elif type == 'timestamp':
+                    extra = extra.replace("DEFAULT '0000-00-00 00:00:00'", "DEFAULT NULL")
+                    extra = extra.replace("NOT NULL", "")
                 elif type == "double":
                     type = "double precision"
                 elif type == "blob":
+                    type = "bytea"
+                elif type == 'varbinary(20)':
                     type = "bytea"
                 elif type.startswith("enum(") or type.startswith("set("):
 
